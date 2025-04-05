@@ -1,0 +1,59 @@
+services:
+  database:
+    image: postgres:17.4
+    environment:
+      - POSTGRES_USER=${PSQL_USER}
+      - POSTGRES_PASSWORD=${PSQL_PASSWORD}
+      - POSTGRES_DB=${PSQL_DB}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - ./psql/data:/var/lib/postgresql/data
+      - ./psql/db-init-scripts:/docker-entrypoint-initdb.d:ro
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PSQL_USER} -d ${PSQL_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:8080:8000"
+    environment:
+      - PORT=8000
+      - DB_HOST=database
+      - DB_PORT=5432
+      - PSQL_USER=${PSQL_USER}
+      - PSQL_PASSWORD=${PSQL_PASSWORD}
+      - PSQL_DB=${PSQL_DB}
+      - BLOB_READ_WRITE_TOKEN=${BLOB_READ_WRITE_TOKEN}
+      - BLOB_STORE_ID=${BLOB_STORE_ID}
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: always
+    volumes:
+      - ./server/scripts:/app/scripts
+      - ./server/migrations:/app/migrations
+      - ./server/logs:/app/logs
+
+#  caddy:  # Uncomment if you want to use Caddy as a reverse proxy
+#    image: caddy:2.9.1
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+#       - ./caddy/data:/data
+#       - ./caddy/config:/config
+#       # - ./caddy/public:/usr/share/caddy/
+#       - ./front-end:/usr/share/caddy
+#    restart: always
+
+
+
+

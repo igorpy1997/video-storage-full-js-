@@ -1,0 +1,77 @@
+{
+    # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+    admin off
+}
+
+
+(common) {
+    header /* {
+        -Server
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+        Pragma "no-cache"
+        Expires "0"
+    }
+    encode gzip zstd
+}
+
+(error) {
+    handle_errors {
+        header -Server
+        respond 404
+    }
+}
+
+example.com {
+    import common
+    import error
+
+    log {
+        output stderr
+        format filter {
+            wrap console
+        }
+        level INFO
+    }
+
+    log {
+        output file /var/log/caddy/example.com.log {
+            roll_size 100MiB
+            roll_keep 10
+        }
+        format json
+        level INFO
+    }
+
+    root * /usr/share/caddy
+
+    # Додатковий хедер для статичних файлів
+    header /* {
+        Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+        Pragma "no-cache"
+        Expires "0"
+    }
+
+    file_server {
+        index index.html
+    }
+
+    route /api/* {
+        uri strip_prefix /api
+        reverse_proxy server:8000 {
+            header_up Cache-Control "no-store, no-cache, must-revalidate"
+            header_up Pragma "no-cache"
+        }
+    }
+
+    route /blob-bridge/* {
+        uri strip_prefix /blob-bridge
+        reverse_proxy blob-bridge:3001 {
+            header_up Cache-Control "no-store, no-cache, must-revalidate"
+            header_up Pragma "no-cache"
+        }
+    }
+}

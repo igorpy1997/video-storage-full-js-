@@ -1,0 +1,35 @@
+{
+  "name": "video-processing-server",
+  "version": "1.0.0",
+  "description": "Full-featured video processing server with database integration",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js",
+    "db:generate": "node scripts/sequelize-auto-migration.js generate",
+    "db:migrate": "node scripts/sequelize-auto-migration.js migrate",
+    "db:status": "node scripts/sequelize-auto-migration.js status",
+    "db:undo": "node scripts/sequelize-auto-migration.js undo",
+    "db:undo-all": "node scripts/sequelize-auto-migration.js undo-all",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@vercel/blob": "^0.18.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "fluent-ffmpeg": "^2.1.2",
+    "http-errors": "^2.0.0",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.35.2",
+    "temp": "^0.9.4",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "sequelize-cli": "^6.6.2"
+  }
+}
