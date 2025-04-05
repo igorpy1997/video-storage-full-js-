@@ -120,18 +120,4 @@ Logs are stored in the `server/logs` directory:
 - Check Docker container logs for detailed error messages
 - Verify Vercel Blob Storage credentials
 
-## Contributing
 
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
-
-## License
-
-[Add your license information]
-
-## Contact
-
-[Add contact information]
