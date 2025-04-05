@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = '/api/api';
 const ITEMS_PER_PAGE = 12;
 
 let currentPage = 0;

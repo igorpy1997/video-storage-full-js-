@@ -22,7 +22,7 @@ services:
       context: ./server
       dockerfile: Dockerfile
     ports:
-      - "127.0.0.1:8080:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       - PORT=8000
       - DB_HOST=database
@@ -33,27 +33,28 @@ services:
       - BLOB_READ_WRITE_TOKEN=${BLOB_READ_WRITE_TOKEN}
       - BLOB_STORE_ID=${BLOB_STORE_ID}
     depends_on:
-      database:
-        condition: service_healthy
+      - database
+      - caddy
+
     restart: always
     volumes:
-      - ./server/scripts:/app/scripts
-      - ./server/migrations:/app/migrations
-      - ./server/logs:/app/logs
-
-#  caddy:  # Uncomment if you want to use Caddy as a reverse proxy
-#    image: caddy:2.9.1
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    volumes:
-#       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-#       - ./caddy/data:/data
-#       - ./caddy/config:/config
-#       # - ./caddy/public:/usr/share/caddy/
-#       - ./front-end:/usr/share/caddy
-#    restart: always
-
-
-
-
+      - ./main.js:/app/main.js
+      - ./models:/app/models
+      - ./config:/app/config
+      - ./scripts:/app/scripts
+      - ./.sequelizerc:/app/\.sequelizerc
+      - ./routes:/app/routes
+      - ./utils:/app/utils
+      - ./services:/app/services
+  caddy:  # Uncomment if you want to use Caddy as a reverse proxy
+    image: caddy:2.9.1
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+       - ./caddy/data:/data
+       - ./caddy/config:/config
+       # - ./caddy/public:/usr/share/caddy/
+       - ./front-end:/usr/share/caddy
+    restart: always
